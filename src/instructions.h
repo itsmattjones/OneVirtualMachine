@@ -22,4 +22,13 @@ typedef enum
     NOP
 } Instructions;
 
+/*
+ToDo Add:
+MOD - modulus
+NOT - Logic gate
+XOR - ""
+OR  - ""
+AND - ""
+*/
+
 #endif

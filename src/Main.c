@@ -1,10 +1,11 @@
 #include "instructions.h"
 #include "registers.h"
+#include "debug_tools.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
-#define STACK_SIZE 256
+#define STACK_SIZE 256                // Arbituary value
 static int stack[STACK_SIZE];         // Stack array
 static int registers[REGISTER_SIZE];  // Registers Array
 
@@ -18,35 +19,6 @@ int instruction_space = 4;            // Space allocated for the instruction
 #define RUNNING (registers[RUN])
 #define IS_JUMP (registers[JMP])
 #define FETCH (instructions[IP])
-
-/* prints the stack from A to B */
-void print_stack() 
-{
-    for (int i = 0; i < SP; i++) 
-    {
-        printf("0x%04d ", stack[i]);
-        if ((i + 1) % 4 == 0) { printf("\n"); }
-    }
-    if (SP != 0) { printf("\n"); }
-}
-
-void print_registers() 
-{
-    printf("Register Dump:\n");
-    for (int i = 0; i < REGISTER_SIZE; i++) 
-    {
-        printf("%04d ", registers[i]);
-        if ((i + 1) % 4 == 0) { printf("\n"); }
-    }
-}
-
-int find_empty_register()
-{
-    for (int i = 0; i < REGISTER_SIZE; i++)
-        if (i != registers[EX] && i != registers[EXA]) { return i; }
-    
-    return EX;
-}
 
 void eval(int instr) 
 {
@@ -75,13 +47,8 @@ void eval(int instr)
         {
             registers[A] = stack[SP];
             SP = SP - 1;
-
             registers[B] = stack[SP];
-            /* SP = SP - 1; */
-
             registers[C] = registers[B] + registers[A];
-
-            /* SP = SP + 1; */
             stack[SP] = registers[C];
             printf("%d + %d = %d\n", registers[B], registers[A], registers[C]);
             break;
@@ -90,13 +57,8 @@ void eval(int instr)
         {
             registers[A] = stack[SP];
             SP = SP - 1;
-
             registers[B] = stack[SP];
-            /*SP = SP - 1;*/
-
             registers[C] = registers[B] * registers[A];
-
-            /*SP = SP + 1;*/
             stack[SP] = registers[C];
             printf("%d * %d = %d\n", registers[B], registers[A], registers[C]);
             break;
@@ -105,13 +67,8 @@ void eval(int instr)
         {
             registers[A] = stack[SP];
             SP = SP - 1;
-
             registers[B] = stack[SP];
-            /* SP = SP - 1;*/
-
             registers[C] = registers[B] / registers[A];
-
-            /* SP = SP + 1; */
             stack[SP] = registers[C];
             printf("%d / %d = %d\n", registers[B], registers[A], registers[C]);
             break;
@@ -120,13 +77,8 @@ void eval(int instr)
         {
             registers[A] = stack[SP];
             SP = SP - 1;
-
             registers[B] = stack[SP];
-            /* SP = SP - 1; */
-
             registers[C] = registers[B] - registers[A];
-
-            /* SP = SP + 1; */
             stack[SP] = registers[C];
             printf("%d - %d = %d\n", registers[B], registers[A], registers[C]);
             break;
@@ -200,19 +152,12 @@ void eval(int instr)
             break;
         }
     }
-    print_stack();
-    print_registers();
+    print_stack(stack);
+    print_registers(registers);
 }
 
-int main(int argc, char** argv) 
+void init_instructions(char *filename)
 {
-    if (argc <= 1) 
-    {
-        printf("error: no input files\n");
-        return -1;
-    }
-
-    char *filename = argv[1]; // filename
     FILE *file = fopen(filename, "r");
     if (!file) 
     {
@@ -223,7 +168,7 @@ int main(int argc, char** argv)
     // allocate space for instructions
     instructions = malloc(sizeof(*instructions) * instruction_space); // 4 instructions
 
-    // read the "binary" file
+    // read the data from the file
     int num;
     int i = 0;
     while (fscanf(file, "%d", &num) > 0) 
@@ -237,18 +182,26 @@ int main(int argc, char** argv)
             instructions = realloc(instructions, sizeof(*instructions) * instruction_space); // double size
         }
     }
-    
-    // set 'instruction_count' to number of instructions read
-    instruction_count = i;
-
-    // close the file
+    instruction_count = i; // Instructions read
     fclose(file);
+
+}
+
+int main(int argc, char** argv) 
+{
+    if (argc <= 1) 
+    {
+        printf("error: no input files\n");
+        return -1;
+    }
+
+    // initalize instruction set
+    init_instructions(argv[1]);
 
     // initialize stack pointer
     SP = -1;
 
-    // loop through program, but don't
-    // go out of the programs bounds
+    // Start program tick
     RUNNING = true;
     while (RUNNING && IP < instruction_count) 
     {
@@ -257,7 +210,7 @@ int main(int argc, char** argv)
             IP = IP + 1;
     }
 
-    // clean up instructions
+    // clean up
     free(instructions);
 
     return 0;
