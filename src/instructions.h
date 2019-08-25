@@ -11,6 +11,7 @@ typedef enum
     MUL, 
     DIV, 
     SUB, 
+    MOD,
     SLT, 
     MOV, 
     SET, 
@@ -21,14 +22,5 @@ typedef enum
     GPT,
     NOP
 } Instructions;
-
-/*
-ToDo Add:
-MOD - modulus
-NOT - Logic gate
-XOR - ""
-OR  - ""
-AND - ""
-*/
 
 #endif

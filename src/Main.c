@@ -13,7 +13,7 @@ int *instructions;                    // Instructions array
 int instruction_count = 0;            // Number of instructions to do
 int instruction_space = 4;            // Space allocated for the instruction
 
-/* Quick ways to get SP, IP, JMP, RUN and Fetch current instruction set */
+/* Quick Access hack */
 #define SP (registers[SP])
 #define IP (registers[IP])
 #define RUNNING (registers[RUN])
@@ -83,6 +83,16 @@ void eval(int instr)
             printf("%d - %d = %d\n", registers[B], registers[A], registers[C]);
             break;
         }
+        case MOD:
+        {
+            registers[A] = stack[SP];
+            SP = SP - 1;
+            registers[B] = stack[SP];
+            registers[C] = registers[A] % registers[B];
+            stack[SP] = registers[C];
+            printf("%d % %d = %d\n", registers[A], registers[B], registers[C]);
+            break;
+        }
         case SLT: 
         {
             SP = SP - 1;
@@ -129,7 +139,8 @@ void eval(int instr)
                 IP = IP + 3;
             break;
         }
-        case GLD: {
+        case GLD: 
+        {
             SP = SP + 1;
             IP = IP + 1;
             stack[SP] = registers[instructions[IP]];
