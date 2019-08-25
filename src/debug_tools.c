@@ -15,7 +15,6 @@ void print_stack(int stack[])
 
 void print_registers(int registers[]) 
 {
-    printf("Register Dump:\n");
     for (int i = 0; i < REGISTER_SIZE; i++) 
     {
         printf("%04d ", registers[i]);
