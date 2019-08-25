@@ -1,6 +1,6 @@
 # OneVirtualMachine
 ## What's this?
-This is a WIP experimental virtual machine which uses a stack and registers to fetch, decode and execute instructions from a file.<br>
+This is a WIP experimental stack based virtual machine which fetches, decodes and executes instructions from a file.<br>
 
 ## Documentation
 ### Registers
