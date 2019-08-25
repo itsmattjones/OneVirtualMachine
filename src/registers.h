@@ -1,5 +1,5 @@
 #ifndef REGISTERS_H
-#define REGISTERS_h
+#define REGISTERS_H
 
 /* Registers */
 typedef enum 

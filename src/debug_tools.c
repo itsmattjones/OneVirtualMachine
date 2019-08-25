@@ -1,6 +1,7 @@
 #include "debug_tools.h"
 #include "instructions.h"
 #include "registers.h"
+#include <stdio.h>
 
 void print_stack(int stack[]) 
 {
