@@ -1,7 +1,6 @@
 # OneVirtualMachine
 ## What's this?
 This is a work in progress virtual machine. <br>
-It will eventually be a basic virtual machine with a UI to show what's happening behind the scenes, to allow a better understanding of how virtual machines work.
 
 ## Documentation
 ### Registers
