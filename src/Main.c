@@ -90,7 +90,7 @@ void eval(int instr)
             registers[B] = stack[SP];
             registers[C] = registers[A] % registers[B];
             stack[SP] = registers[C];
-            printf("%d % %d = %d\n", registers[A], registers[B], registers[C]);
+            printf("%d mod %d = %d\n", registers[A], registers[B], registers[C]);
             break;
         }
         case SLT: 
@@ -167,13 +167,13 @@ void eval(int instr)
     print_registers(registers);
 }
 
-void init_instructions(char *filename)
+bool init_instructions(char *filename)
 {
     FILE *file = fopen(filename, "r");
     if (!file) 
     {
         printf("error: could not read file `%s`\n", filename);
-        return -1;
+        return false;
     }
 
     // allocate space for instructions
@@ -196,6 +196,7 @@ void init_instructions(char *filename)
     instruction_count = i; // Instructions read
     fclose(file);
 
+    return true;
 }
 
 int main(int argc, char** argv) 
@@ -206,8 +207,12 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    // initalize instruction set
-    init_instructions(argv[1]);
+    // initalise instruction set
+    if(!init_instructions(argv[1]))
+    {
+        printf("error: could not initalise instructions\n");
+        return -1;
+    }
 
     // initialize stack pointer
     SP = -1;
