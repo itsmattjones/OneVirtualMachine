@@ -1,6 +1,6 @@
 # OneVirtualMachine
 ## What's this?
-This is a work in progress virtual machine. <br>
+This is a WIP experimental virtual machine which uses a stack and registers to fetch, decode and execute instructions from a file.<br>
 
 ## Documentation
 ### Registers
