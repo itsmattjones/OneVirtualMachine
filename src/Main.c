@@ -188,13 +188,13 @@ void eval(int instr)
     }
 }
 
-bool init_instructions(char *filename)
+int init_instructions(char *filename)
 {
     FILE *file = fopen(filename, "r");
     if (!file) 
     {
         log_append_string("!Error! could not read file");
-        return false;
+        return -1;
     }
 
     // allocate space for instructions
@@ -216,10 +216,10 @@ bool init_instructions(char *filename)
     instruction_count = i; // Instructions read
     fclose(file);
 
-    return true;
+    return 0;
 }
 
-bool init_user_interface()
+int init_user_interface()
 {
     initscr();
     cbreak();
@@ -242,7 +242,7 @@ bool init_user_interface()
     mvaddstr(buffer_windows_titles_y, 93, "Reg.");
 
     refresh();
-    return true;
+    return 0;
 }
 
 int main(int argc, char** argv) 
@@ -254,7 +254,7 @@ int main(int argc, char** argv)
     }
 
     // Initalise instruction set
-    if(!init_instructions(argv[1]))
+    if(init_instructions(argv[1]) != 0)
     {
         log_append_string("!Error! could not initalise instructions");
         return -1;
@@ -264,7 +264,7 @@ int main(int argc, char** argv)
     SP = -1;
 
     // Initalize user interface
-    if(!init_user_interface())
+    if(init_user_interface() != 0)
     {
         log_append_string("!Error! could not initalise user interface");
         return -1;
@@ -274,11 +274,13 @@ int main(int argc, char** argv)
     registers[RUN] = true;
     while (registers[RUN] && IP < instruction_count) 
     {
-        //sleep(1);
+        sleep(1);
 
         // Evaluate instruction at IP.
         eval(instructions[IP]);
-
+        if(!registers[JMP])
+            IP = IP + 1;
+            
         // Update UI to show inner workings.
         if(!ui_update_instructions(instruction_window, instructions, instruction_count, IP) || 
            !ui_update_registers(register_window, registers) || 
@@ -287,9 +289,6 @@ int main(int argc, char** argv)
             log_append_string("!Error! error updating UI (Windows not initalized?)");
             return -1;
         }
-
-        if(!registers[JMP])
-            IP = IP + 1;
     }
 
     // Pause
