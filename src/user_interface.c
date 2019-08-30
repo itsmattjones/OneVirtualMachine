@@ -16,15 +16,24 @@ bool ui_update_instructions(WINDOW *window, int *instructions, int instr_count, 
     if(window == NULL)
         return false;
 
-    for(int i = 0; i < (instr_count - instr_ptr); i++)
+    int curr_instruction = instr_ptr;
+    for(int curr_line = 1; curr_line <= 22; curr_line++)
     {
-        if(instr_ptr + i > 22) // Keep within window borders
-            break;
-
-        char instruction_str[12];
-        sprintf(instruction_str, "%d", instructions[instr_ptr + i]);
-        mvwaddstr(window, i + 1, 1, instruction_str);
-        wrefresh(window);
+        if(curr_instruction < instr_count)
+        {
+            // Output instruction if one's available.
+            char instruction_str[12];
+            sprintf(instruction_str, "%d", instructions[curr_instruction]);
+            mvwaddstr(window, curr_line, 1, instruction_str);
+            wrefresh(window);
+        }
+        else
+        {
+            // Clear line hack for null instructions (hack due to window width).
+            mvwaddstr(window, curr_line, 1, "     ");
+            wrefresh(window);
+        }
+        curr_instruction++;
     }
     return true;
 }
