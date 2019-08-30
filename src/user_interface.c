@@ -1,7 +1,7 @@
 #include <curses.h>
 #include "registers.h"
 
-WINDOW *create_new_window(int height, int width, int start_y, int start_x)
+WINDOW *ui_create_new_window(int height, int width, int start_y, int start_x)
 {	
     WINDOW *local_win;
 	local_win = newwin(height, width, start_y, start_x);
@@ -11,13 +11,16 @@ WINDOW *create_new_window(int height, int width, int start_y, int start_x)
 	return local_win;
 }
 
-bool update_instructions(WINDOW *window, int *instructions, int instr_count, int instr_ptr)
+bool ui_update_instructions(WINDOW *window, int *instructions, int instr_count, int instr_ptr)
 {
     if(window == NULL)
         return false;
 
-    for(int i = 0; i < ((instr_count - instr_ptr) - 1); i++)
+    for(int i = 0; i < (instr_count - instr_ptr); i++)
     {
+        if(instr_ptr + i > 22) // Keep within window borders
+            break;
+
         char instruction_str[12];
         sprintf(instruction_str, "%d", instructions[instr_ptr + i]);
         mvwaddstr(window, i + 1, 1, instruction_str);
@@ -26,7 +29,7 @@ bool update_instructions(WINDOW *window, int *instructions, int instr_count, int
     return true;
 }
 
-bool update_stack(WINDOW *window, int *stack)
+bool ui_update_stack(WINDOW *window, int *stack)
 {
     if(window == NULL)
         return false;
@@ -49,7 +52,7 @@ bool update_stack(WINDOW *window, int *stack)
     return true;
 }
 
-bool update_registers(WINDOW *window, int *registers)
+bool ui_update_registers(WINDOW *window, int *registers)
 {
     if(window == NULL)
         return false;

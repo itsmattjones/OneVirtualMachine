@@ -1,7 +1,7 @@
 #include "instructions.h"
 #include "registers.h"
-#include "debug_tools.h"
 #include "user_interface.h"
+#include "logger.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -20,27 +20,23 @@ int *instructions;
 int instruction_count = 0;
 int instruction_space = 4;
 
-/* Quick Access hack */
+/* Quick Access hack for SP & IP */
 #define SP (registers[SP])
 #define IP (registers[IP])
-#define RUNNING (registers[RUN])
-#define IS_JUMP (registers[JMP])
-#define FETCH (instructions[IP])
 
 /* User Interface Windows */
 WINDOW *instruction_window;
 WINDOW *stack_window;
 WINDOW *register_window;
-WINDOW *output_window;
 
 void eval(int instr) 
 {
-    IS_JUMP = false;
+    registers[JMP] = false;
     switch (instr) 
     {
         case HLT: 
         {
-            RUNNING = false;
+            registers[RUN] = false;
             break;
         }
         case PSH: 
@@ -121,8 +117,25 @@ void eval(int instr)
         }
         case LOG: 
         {
-            // printf("LOG: %d\n", registers[instructions[IP + 1]]);
-            // ToDo: Need to log to UI or something
+            if(!log_append_int(instructions[IP + 1]))
+                printf("Failed to append log\n");
+                
+            IP = IP + 1;
+            break;
+        }
+        case LOGR:
+        {
+            if(!log_append_int(registers[instructions[IP + 1]]))
+                printf("Failed to append log\n");
+
+            IP = IP + 1;
+            break;
+        }
+        case LOGS:
+        {
+            if(!log_append_int(stack[SP - registers[instructions[IP + 1]]]))
+                printf("Failed to append log\n");
+
             IP = IP + 1;
             break;
         }
@@ -131,7 +144,7 @@ void eval(int instr)
             if (registers[instructions[IP + 1]] == instructions[IP + 2]) 
             {
                 IP = instructions[IP + 3];
-                IS_JUMP = true;
+                registers[JMP] = true;
             }
             else
                 IP = IP + 3;
@@ -142,7 +155,7 @@ void eval(int instr)
             if (registers[instructions[IP + 1]] != instructions[IP + 2]) 
             {
                 IP = instructions[IP + 3];
-                IS_JUMP = true;
+                registers[JMP] = true;
             }
             else 
                 IP = IP + 3;
@@ -167,8 +180,9 @@ void eval(int instr)
         }
         default:
         {
-            // printf("Unknown Instruction %d\n", instr);
-            // ToDo: Throw error, on ui?
+            char error_str[32];
+            sprintf(error_str, "%s: %d", "!Error! Unknown Instruction", instr);
+            log_append_string(error_str);
             break;
         }
     }
@@ -179,7 +193,7 @@ bool init_instructions(char *filename)
     FILE *file = fopen(filename, "r");
     if (!file) 
     {
-        printf("error: could not read file `%s`\n", filename);
+        log_append_string("!Error! could not read file");
         return false;
     }
 
@@ -219,17 +233,13 @@ bool init_user_interface()
     // Title
     mvaddstr(1, 43, "Virtual Machine");
 
-    // Buffer Windows
-    instruction_window = create_new_window(24, 8, buffer_windows_y, 1);
+    // Creates outline of buffer Windows
+    instruction_window = ui_create_new_window(24, 8, buffer_windows_y, 1);
     mvaddstr(buffer_windows_titles_y, 2, "Instr."); 
-    stack_window = create_new_window(24, 82, buffer_windows_y, 9);
+    stack_window = ui_create_new_window(24, 82, buffer_windows_y, 9);
     mvaddstr(buffer_windows_titles_y, 48, "Stack");
-    register_window = create_new_window(24, 8, buffer_windows_y, 91);
+    register_window = ui_create_new_window(24, 8, buffer_windows_y, 91);
     mvaddstr(buffer_windows_titles_y, 93, "Reg.");
-
-    // Output window
-    output_window = create_new_window(8, 98, 30, 1);
-    mvaddstr(29, 46, "Output");
 
     refresh();
     return true;
@@ -239,45 +249,47 @@ int main(int argc, char** argv)
 {
     if (argc <= 1) 
     {
-        printf("error: no input files\n");
+        log_append_string("!Error! no input files");
         return -1;
     }
 
-    // initalise instruction set
+    // Initalise instruction set
     if(!init_instructions(argv[1]))
     {
-        printf("error: could not initalise instructions\n");
+        log_append_string("!Error! could not initalise instructions");
         return -1;
     }
+
+    // Initialize stack pointer
+    SP = -1;
 
     // Initalize user interface
     if(!init_user_interface())
     {
-        printf("error: could not initalise user interface\n");
+        log_append_string("!Error! could not initalise user interface");
         return -1;
     }
 
-    // initialize stack pointer
-    SP = -1;
-
-    // Start program tick
-    RUNNING = true;
-    while (RUNNING && IP < instruction_count) 
+    // Start tick
+    registers[RUN] = true;
+    while (registers[RUN] && IP < instruction_count) 
     {
         //sleep(1);
 
-        eval(FETCH);
-        if(!IS_JUMP)
-            IP = IP + 1;
+        // Evaluate instruction at IP.
+        eval(instructions[IP]);
 
-        // Update UI
-        if(!update_instructions(instruction_window, instructions, instruction_count, IP) || 
-           !update_registers(register_window, registers) || 
-           !update_stack(stack_window, stack))
+        // Update UI to show inner workings.
+        if(!ui_update_instructions(instruction_window, instructions, instruction_count, IP) || 
+           !ui_update_registers(register_window, registers) || 
+           !ui_update_stack(stack_window, stack))
         {
-            printf("Error updating UI (Windows not initalized?)\n");
+            log_append_string("!Error! error updating UI (Windows not initalized?)");
             return -1;
         }
+
+        if(!registers[JMP])
+            IP = IP + 1;
     }
 
     // Pause
