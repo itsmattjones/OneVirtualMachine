@@ -11,7 +11,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    if(vm_initalize(argv[0]) != 0)
+    if(vm_initalize(argv[1]) != 0)
     {
         logger_log_string("[ERROR] Could not initalize virtual machine.");
         return -1;
@@ -27,6 +27,8 @@ int main(int argc, char** argv)
     vm_registers[RUN] = true;
     while (vm_registers[RUN]) 
     {
+        sleep(1); // For dramatic effect.
+
         // Tick the Virtual Machine.
         if(vm_tick() != 0)
             logger_log_string("[ERROR] Could not tick virtual machine.");
