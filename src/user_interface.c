@@ -105,11 +105,11 @@ int ui_update_registers()
 int ui_tick()
 {
     // Update each section of the UI.
-    if(!ui_update_instructions())
+    if(ui_update_instructions() != 0)
         logger_log_string("[ERROR] Could not update the Instructions Window");
-    if(!ui_update_registers())
+    if(ui_update_registers() != 0)
         logger_log_string("[ERROR] Could not update the Registers Window");
-    if(!ui_update_stack())
+    if(ui_update_stack() != 0)
         logger_log_string("[ERROR] Could not update the Stack Window");
     return 0;
 }

@@ -190,7 +190,6 @@ int vm_load_instructions(char *filename)
     }
 
     // Allocate space for vm_instructions
-    free(vm_instructions);
     vm_instructions = malloc(sizeof(*vm_instructions) * vm_instruction_space); // 4 vm_instructions
 
     // Read the data from the file
@@ -214,6 +213,10 @@ int vm_load_instructions(char *filename)
 
 int vm_initalize(char* filename) 
 {
+    // Local Varibles
+    vm_instruction_count = 0;
+    vm_instruction_space = 4;
+
     // There must be an input file.
     if (!filename) 
     {
