@@ -4,7 +4,7 @@
 
 const char* log_file = "General.log";
 
-bool log_append_int(int value)
+bool logger_log_int(int value)
 {
     // Create/Get the log file.
     FILE *file;
@@ -24,7 +24,7 @@ bool log_append_int(int value)
     return true;
 }
 
-bool log_append_string(char* text)
+bool logger_log_string(char* text)
 {
     // Create/Get the log file.
     FILE *file;
