@@ -2,7 +2,7 @@
 #define LOGGER_H
 #include <stdbool.h>
 
-bool log_append_int(int value);
-bool log_append_string(char* text);
+bool logger_log_int(int value);
+bool logger_log_string(char* text);
 
 #endif
