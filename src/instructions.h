@@ -1,7 +1,6 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-/* Instructions */
 typedef enum 
 {
     HLT,
