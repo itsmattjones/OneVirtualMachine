@@ -23,7 +23,7 @@ int ui_initalize()
     clear();
     refresh();
 
-    // Display base user interface.
+    // Display base user interface layout.
     const int buffer_windows_titles_y = 3;
     const int buffer_windows_y = 4;
     mvaddstr(1, 43, "Virtual Machine");
@@ -70,6 +70,7 @@ int ui_update_stack()
     if(ui_stack_window == NULL)
         return -1;
 
+    // Output values of entire stack.
     int stack_idx = 0;
     int curr_col = 2;
     while(curr_col <= 80)
@@ -92,6 +93,7 @@ int ui_update_registers()
     if(ui_register_window == NULL)
         return -1;
 
+    // Output the value of each register.
     for(int i = 0; i < REGISTER_SIZE; i++)
     {
         char register_str[12];
