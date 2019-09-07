@@ -1,8 +1,13 @@
 # OneVirtualMachine
 ## What's this?
-This is a WIP experimental stack based virtual machine which fetches, decodes and executes instructions from a file.<br>
+This is a conceptual stack based virtual machine which fetches, decodes and executes instructions from a given file. It also provides a simple terminal based UI built with ncurses to show the process taking place.<br>
 
 ## Documentation
+### Usage
+Navigate to the containing directory (/src/) in a terminal window.<br>
+Run the command '*make*' to build with cmake<br>
+Run the command '*./OneVirtualMachine [InstructionFile]*' to run the program<br>
+
 ### Registers
 | Type                | Name                   |
 |---------------------|------------------------|
