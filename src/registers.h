@@ -1,7 +1,6 @@
 #ifndef REGISTERS_H
 #define REGISTERS_H
 
-/* Registers */
 typedef enum 
 {
     A, 
