@@ -7,6 +7,10 @@ WINDOW *ui_instruction_window;
 WINDOW *ui_stack_window;
 WINDOW *ui_register_window;
 
+int window_height;
+int window_start_y_idx;
+int window_title_start_y_idx;
+
 /* Functionality */
 WINDOW *ui_create_new_window(int height, int width, int start_y, int start_x);
 int ui_initalize();
