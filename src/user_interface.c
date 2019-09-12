@@ -7,14 +7,17 @@ WINDOW *ui_create_new_window(int height, int width, int start_y, int start_x)
 {	
     WINDOW *local_win;
 	local_win = newwin(height, width, start_y, start_x);
-    // 0, 0 gives default characters for the vertical and horrizontal lines
-	box(local_win, 0 , 0); 
+	box(local_win, 0 , 0); // default characters for the v and h lines
 	wrefresh(local_win); // Show that box
 	return local_win;
 }
 
 int ui_initalize()
 {
+    window_height = 24;
+    window_start_y_idx = 4;
+    window_title_start_y_idx = 3;
+
     // Initalize and setup ncurses.
     initscr();  // Init
     cbreak();   // Disable line buffering
@@ -24,15 +27,13 @@ int ui_initalize()
     refresh();
 
     // Display base user interface layout.
-    const int buffer_windows_titles_y = 3;
-    const int buffer_windows_y = 4;
     mvaddstr(1, 43, "Virtual Machine");
-    ui_instruction_window = ui_create_new_window(24, 8, buffer_windows_y, 1);
-    mvaddstr(buffer_windows_titles_y, 2, "Instr."); 
-    ui_stack_window = ui_create_new_window(24, 82, buffer_windows_y, 9);
-    mvaddstr(buffer_windows_titles_y, 48, "Stack");
-    ui_register_window = ui_create_new_window(24, 8, buffer_windows_y, 91);
-    mvaddstr(buffer_windows_titles_y, 93, "Reg.");
+    ui_instruction_window = ui_create_new_window(window_height, 8, window_start_y_idx, 1);
+    mvaddstr(window_title_start_y_idx, 2, "Instr."); 
+    ui_stack_window = ui_create_new_window(window_height, 82, window_start_y_idx, 9);
+    mvaddstr(window_title_start_y_idx, 48, "Stack");
+    ui_register_window = ui_create_new_window(window_height, 8, window_start_y_idx, 91);
+    mvaddstr(window_title_start_y_idx, 93, "Reg.");
 
     refresh();
     return 0;
@@ -44,7 +45,7 @@ int ui_update_instructions()
         return -1;
 
     int curr_instruction = vm_registers[IP];
-    for(int curr_line = 1; curr_line <= 22; curr_line++)
+    for(int curr_line = 1; curr_line < (getmaxy(ui_instruction_window) - 1); curr_line++)
     {
         if(curr_instruction < vm_instruction_count)
         {
